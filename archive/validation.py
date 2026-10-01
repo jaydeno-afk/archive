@@ -36,7 +36,15 @@ def validate_id(value):
 
     Returns (bool, str).
     """
-    raise NotImplementedError("validate_id")
+    if len(value)!=5:
+        return False, "wrong number of terms in ID"
+    elif value[0]!='M' or value[1]!='S':
+        return False, "wrong inital format of the ID"
+    else:
+        for i in range(2,5):
+            if not value[i].isdigit():
+                return False,"non digit in final 3 spaces for ID"
+    return True,""
 
 
 def validate_title(value):
@@ -47,7 +55,10 @@ def validate_title(value):
 
     Returns (bool, str).
     """
-    raise NotImplementedError("validate_title")
+    value=value.strip()
+    if len(value)<3:
+        return False,"not enough characters in title"
+    return True,""
 
 
 def validate_city(value):
@@ -99,4 +110,16 @@ def validate_record(record):
 
     Do not re-write the rules here. Call the five functions above.
     """
-    raise NotImplementedError("validate_record")
+    result=[]
+    di=validate_id(record['id'])
+    title=validate_title(record['title'])
+    city=validate_city(record['city'])
+    year=validate_year(record['year'])
+    condition=validate_condition(record['condition'])
+    checking=[di,title,city,year,condition]
+    for item in checking:
+        if not item[0]:
+            result.append(item[1])
+    return result
+
+
