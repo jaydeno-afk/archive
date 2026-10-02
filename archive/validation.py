@@ -70,10 +70,22 @@ def validate_city(value):
 
     Returns (bool, str).
     """
-    raise NotImplementedError("validate_city")
+    city = value.strip().lower()
+
+    if not city:
+        return False, "City is missing."
+
+    for known_city in KNOWN_CITIES:
+        if city == known_city.lower():
+            return True, ""
+
+    return False, "City is not in the list of known cities."
+
 
 
 def validate_year(value):
+
+    
     """A year must be present, numeric, and between MIN_YEAR and MAX_YEAR
     INCLUSIVE.
 
@@ -85,7 +97,25 @@ def validate_year(value):
 
     Returns (bool, str).
     """
-    raise NotImplementedError("validate_year")
+
+    text = value.strip()
+
+    if not text:
+        return False, "Year is missing."
+
+    if not text.isdecimal():
+        return False, "Year must contain digits only."
+
+    try:
+        year = int(text)
+    except ValueError:
+        return False, "Year could not be converted to an integer."
+
+    if not MIN_YEAR <= year <= MAX_YEAR:
+        return False, f"Year must be between {MIN_YEAR} and {MAX_YEAR}, inclusive."
+
+    return True, ""
+
 
 
 def validate_condition(value):
@@ -96,7 +126,17 @@ def validate_condition(value):
 
     Returns (bool, str).
     """
-    raise NotImplementedError("validate_condition")
+
+    condition = value.strip().lower()
+
+    if not condition:
+        return False, "Condition is missing."
+
+    if condition not in VALID_CONDITIONS:
+        return False, "Condition must be fragile, fair, or good."
+
+    return True, ""
+
 
 
 def validate_record(record):
