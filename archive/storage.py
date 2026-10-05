@@ -14,6 +14,7 @@ any work.
 """
 
 from archive.errors import MalformedRecordError
+from archive.validation import validate_record
 
 FIELD_NAMES = ["id", "title", "city", "year", "condition"]
 
@@ -31,7 +32,19 @@ def parse_line(line):
 
     Returns dict.
     """
-    raise NotImplementedError("parse_line")
+
+    fields = line.strip().split(",")
+
+    if len(fields) != 5:
+        raise MalformedRecordError("A record must have 5 fields.")
+
+    return {
+        "id": fields[0].strip(),
+        "title": fields[1].strip(),
+        "city": fields[2].strip(),
+        "year": fields[3].strip(),
+        "condition": fields[4].strip()
+    }
 
 
 def load_archive(path):
@@ -50,7 +63,32 @@ def load_archive(path):
 
     Returns (list, list).
     """
-    raise NotImplementedError("load_archive")
+
+    valid_records = []
+    rejected_lines = []
+
+    try:
+        file = open(path, "r", encoding="utf-8", newline="")
+    except FileNotFoundError:
+        return [], []
+
+    with file:
+        for line in file:
+            if line.strip() == "":
+                continue
+
+            try:
+                record = parse_line(line)
+            except MalformedRecordError:
+                rejected_lines.append(line)
+                continue
+
+            if validate_record(record) == []:
+                valid_records.append(record)
+            else:
+                rejected_lines.append(line)
+
+    return valid_records, rejected_lines
 
 
 def save_archive(path, records):
@@ -60,4 +98,15 @@ def save_archive(path, records):
 
     Returns None.
     """
+
+    with open(path, "w", encoding="utf-8", newline="") as file:
+        for record in records:
+            values = []
+
+            for name in FIELD_NAMES:
+                values.append(str(record[name]))
+
+            line = ",".join(values)
+            file.write(line + "\n")
+            
     raise NotImplementedError("save_archive")
