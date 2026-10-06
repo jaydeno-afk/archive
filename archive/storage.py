@@ -109,4 +109,3 @@ def save_archive(path, records):
             line = ",".join(values)
             file.write(line + "\n")
             
-    raise NotImplementedError("save_archive")
